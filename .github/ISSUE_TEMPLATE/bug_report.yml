@@ -1,0 +1,32 @@
+name: Bug report
+description: Report a problem in Reading Helper
+labels: [bug]
+body:
+  - type: textarea
+    id: desc
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+      placeholder: Clear, concise description...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: 1) Go to ... 2) Select ... 3) Click ...
+  - type: input
+    id: version
+    attributes:
+      label: Extension version (if known)
+      placeholder: e.g., v2.0 (check chrome://extensions)
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      placeholder: Windows 11, Chrome 128, page URL (if public), other extensions...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console/service worker logs
+      render: shell

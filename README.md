@@ -165,11 +165,12 @@ reading-helper/
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes  
-4. Test thoroughly
-5. Submit a pull request
+We welcome contributions! Please read CONTRIBUTING.md for setup, guidelines, and a quick manual test checklist. Be kind and follow our CODE_OF_CONDUCT.md.
+
+Quick start:
+- Check issues labeled “good first issue” or “help wanted”
+- Fork → create a branch → open a focused PR with a clear description and screenshots/GIFs for UI changes
+- Add your Gemini key via secrets.json (see Setup)
 
 ## 📄 License
 

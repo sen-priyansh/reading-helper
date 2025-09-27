@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest an idea to improve Reading Helper
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      placeholder: When I try to ..., it’s hard because ...
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: I think it should ...
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Areas
+      options:
+        - label: Content script (in-page UI)
+        - label: Popup/Toolbox UI
+        - label: Background/service worker
+        - label: Performance
+        - label: Accessibility
+        - label: Docs
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
