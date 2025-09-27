@@ -9,6 +9,9 @@ let lastSelectedText = '';
 // New variable to store the most recently fetched meaning.
 let currentMeaning = '';
 
+// Storage for highlights across all pages
+let highlightsStorage = {};
+
 // Create a context menu item that appears when text is selected.
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
@@ -20,7 +23,6 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Listener for messages from content scripts.
-// The popup.js logic is no longer relevant as meaning is shown on-page.
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Background] Message received from:', sender.tab ? `content script (${sender.tab.url})` : 'unknown sender', 'Request:', request);
 
@@ -30,8 +32,76 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Clear previous meaning if the selection changes to ensure a fresh fetch for new text.
         currentMeaning = '';
         console.log(`[Background] Stored new selected text from content script: "${lastSelectedText.substring(0, 50)}..."`);
+    } else if (request.action === "openTab") {
+        // Open new tab for web search
+        chrome.tabs.create({ url: request.url });
+    } else if (request.action === "getMeaningDirect") {
+        // Direct meaning request from hover card
+        if (!request.text || !request.text.trim()) return;
+        if (sender.tab && sender.tab.id) {
+            fetchMeaning(request.text)
+                .then(meaning => {
+                    chrome.tabs.sendMessage(sender.tab.id, {
+                        action: "displayMeaning",
+                        selectedText: request.text,
+                        meaning: meaning
+                    });
+                })
+                .catch(error => {
+                    chrome.tabs.sendMessage(sender.tab.id, {
+                        action: "displayMeaning",
+                        selectedText: request.text,
+                        meaning: `Error: ${error.message}`,
+                        isError: true
+                    });
+                });
+        } else {
+            console.warn('[Background] getMeaningDirect without sender.tab');
+        }
+    } else if (request.action === "saveHighlights") {
+        // Save highlights for a specific URL
+        highlightsStorage[request.url] = request.highlights;
+        // Also save to chrome.storage for persistence using full and base URL keys
+        try {
+            const u = new URL(request.url);
+            const base = `${u.origin}${u.pathname}`;
+            const payload = {
+                [`highlights_${request.url}`]: request.highlights,
+                [`highlights_${base}`]: request.highlights
+            };
+            chrome.storage.local.set(payload);
+        } catch {
+            chrome.storage.local.set({ [`highlights_${request.url}`]: request.highlights });
+        }
+    } else if (request.action === "getHighlights") {
+        // Get highlights for a specific URL
+        const highlights = highlightsStorage[request.url] || [];
+        if (sender.tab) {
+            chrome.tabs.sendMessage(sender.tab.id, {
+                action: "highlightsLoaded",
+                highlights: highlights
+            });
+        }
+        // Also try to load from chrome.storage
+        const exactKey = `highlights_${request.url}`;
+        let baseKey = null;
+        try {
+            const u = new URL(request.url);
+            baseKey = `highlights_${u.origin}${u.pathname}`;
+        } catch {}
+
+        chrome.storage.local.get(baseKey ? [exactKey, baseKey] : [exactKey]).then(result => {
+            const storedHighlights = result[exactKey] || (baseKey ? result[baseKey] : []) || [];
+            if (storedHighlights.length > 0 && sender.tab) {
+                highlightsStorage[request.url] = storedHighlights;
+                chrome.tabs.sendMessage(sender.tab.id, {
+                    action: "highlightsLoaded",
+                    highlights: storedHighlights
+                });
+            }
+        });
     }
-    // No response needed for "selection" action.
+    // No response needed for most actions.
 });
 
 // Listener for context menu clicks.
@@ -115,12 +185,34 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
  * @param {string} text The text to get the meaning for.
  * @returns {Promise<string>} A promise that resolves with the meaning.
  */
+async function getApiKey() {
+    // 1) Try to load from bundled local secrets.json (ignored by git)
+    try {
+        const url = chrome.runtime.getURL('secrets.json');
+        const res = await fetch(url);
+        if (res.ok) {
+            const data = await res.json();
+            if (data && typeof data.GEMINI_API_KEY === 'string' && data.GEMINI_API_KEY.trim()) {
+                return data.GEMINI_API_KEY.trim();
+            }
+        }
+    } catch {}
+    // 2) Try chrome.storage.local
+    try {
+        const stored = await chrome.storage.local.get('GEMINI_API_KEY');
+        if (stored && typeof stored.GEMINI_API_KEY === 'string' && stored.GEMINI_API_KEY.trim()) {
+            return stored.GEMINI_API_KEY.trim();
+        }
+    } catch {}
+    return '';
+}
+
 async function fetchMeaning(text) {
     console.log(`[Background] Calling fetchMeaning for text: "${text.substring(0, 50)}..."`);
-    const apiKey = "YOUR_API_KEY"; // IMPORTANT: Replace with your actual Gemini API Key here
+    const apiKey = await getApiKey();
     if (!apiKey) {
         console.error('[Background] API Key is missing!');
-        throw new Error("Gemini API Key is not set in background.js");
+        throw new Error("Gemini API Key is not configured. Add it to secrets.json or set in chrome.storage.local under GEMINI_API_KEY.");
     }
 
     const prompt = `Provide a concise meaning, definition, or explanation for the following text. If it's a word, give its definition. If it's a sentence or paragraph, explain its core meaning or summarize it briefly. Do not include any conversational filler, just the direct meaning. Text: "${text}"`;

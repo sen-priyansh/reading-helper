@@ -1,0 +1,17 @@
+# Local secrets
+secrets.json
+
+# Node / misc
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Zips / artifacts
+*.zip
+*.tar
+*.gz

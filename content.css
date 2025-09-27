@@ -1,0 +1,119 @@
+/* content.css - Modern styles for Reading Helper */
+
+:root {
+    --rh-accent: #6ee7ff;
+    --rh-accent-2: #a78bfa;
+    --rh-highlight: #fde68a;
+    --rh-highlight-strong: #f59e0b;
+    --rh-contrast-bg: #0b1020;
+    --rh-contrast-text: #ffffff;
+    --rh-border: rgba(0,0,0,0.12);
+    --rh-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+/* Highlight styles */
+.reading-helper-highlight {
+    background: linear-gradient(180deg, rgba(253, 230, 138, 0.9), rgba(253, 230, 138, 0.85)) !important;
+    border-radius: 4px !important;
+    padding: 1px 3px !important;
+    position: relative !important;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease !important;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.15) inset !important;
+}
+
+.reading-helper-highlight:hover {
+    background: linear-gradient(180deg, rgba(253, 230, 138, 1), rgba(253, 230, 138, 0.95)) !important;
+}
+
+/* Bold text styles */
+.reading-helper-bold {
+    font-weight: 800 !important;
+}
+
+/* High contrast styles */
+.reading-helper-contrast {
+    color: var(--rh-contrast-text) !important;
+    background-color: var(--rh-contrast-bg) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1px !important;
+    border-radius: 3px !important;
+    padding: 1px 4px !important;
+}
+
+/* Hover card styles */
+#reading-helper-hover-card {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background: #0f1629 !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--rh-shadow) !important;
+    color: #e5e7eb !important;
+    padding: 6px !important;
+}
+
+#reading-helper-hover-card button {
+    font-family: inherit !important;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04)) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    color: #e5e7eb !important;
+}
+
+/* Meaning box styles */
+#reading-helper-meaning-box {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background: #0f1629 !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+/* Focus overlay styles */
+#reading-helper-focus-overlay {
+    backdrop-filter: blur(2px) !important;
+}
+
+/* Hover card icon buttons */
+#reading-helper-hover-card .reading-helper-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #e5e7eb;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+#reading-helper-hover-card .reading-helper-icon-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.18);
+}
+
+#reading-helper-hover-card .reading-helper-icon-btn:disabled,
+#reading-helper-hover-card .reading-helper-icon-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#reading-helper-hover-card .reading-helper-icon-btn svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Animation for flashing highlights */
+@keyframes reading-helper-flash {
+    0% { background-color: var(--rh-highlight); }
+    50% { background-color: var(--rh-highlight-strong); }
+    100% { background-color: var(--rh-highlight); }
+}
+
+.reading-helper-highlight.flash {
+    animation: reading-helper-flash 1s ease-in-out !important;
+}
+
+/* Ensure text selection is visible */
+::selection { background-color: var(--rh-accent) !important; color: #0b1020 !important; }
+::-moz-selection { background-color: var(--rh-accent) !important; color: #0b1020 !important; }

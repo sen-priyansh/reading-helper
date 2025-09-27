@@ -1,17 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Reading Helper",
-  "version": "1.0",
-  "description": "Get the meaning of selected words, sentences, or paragraphs using the Gemini API.",
+  "version": "2.0",
+  "description": "Get the meaning of selected words, highlight text, and enhance your reading experience with AI assistance.",
   "permissions": [
     "activeTab",
     "contextMenus",
-    "scripting"
+    "scripting",
+    "storage",
+    "tabs",
+    "downloads"
   ],
   "host_permissions": [
-    "https://generativelanguage.googleapis.com/"
+    "https://generativelanguage.googleapis.com/",
+    "<all_urls>"
   ],
   "action": {
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -25,12 +30,19 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "css": ["content.css"]
     }
   ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
